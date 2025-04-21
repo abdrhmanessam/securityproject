@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transportation Cipher</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-lock"></i> Transportation Cipher</h1>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('encrypt')"><i class="fas fa-lock"></i> Encrypt</div>
+            <div class="tab" onclick="switchTab('decrypt')"><i class="fas fa-unlock"></i> Decrypt</div>
+        </div>
+        
+        <div id="encrypt" class="tab-content active">
+            <div class="input-group">
+                <label for="plaintext"><i class="fas fa-pencil-alt"></i> Message to Encrypt:</label>
+                <textarea id="plaintext" placeholder="Enter your message here..."></textarea>
+            </div>
+            <div class="input-group">
+                <label for="encrypt-key"><i class="fas fa-key"></i> Key (numbers separated by spaces):</label>
+                <input type="text" id="encrypt-key" placeholder="e.g. 4 2 1 3">
+            </div>
+            <div class="buttons">
+                <button onclick="encrypt()"><i class="fas fa-lock"></i> Encrypt</button>
+                <button onclick="location.href='index.html'">
+                    <i class="fas fa-random"></i> Another Algorithm
+                </button>
+            </div>
+            <div class="input-group">
+                <label for="encrypt-result"><i class="fas fa-result"></i> Result:</label>
+                <textarea id="encrypt-result" placeholder="Encrypted result will appear here..." readonly></textarea>
+            </div>
+        </div>
+        
+        <div id="decrypt" class="tab-content">
+            <div class="input-group">
+                <label for="ciphertext"><i class="fas fa-pencil-alt"></i> Cipher to Decrypt:</label>
+                <textarea id="ciphertext" placeholder="Enter the encrypted message..."></textarea>
+            </div>
+            <div class="input-group">
+                <label for="decrypt-key"><i class="fas fa-key"></i> Key (numbers separated by spaces):</label>
+                <input type="text" id="decrypt-key" placeholder="Must be the same key used for encryption">
+            </div>
+            <div class="buttons">
+                <button onclick="decrypt()"><i class="fas fa-unlock"></i> Decrypt</button>
+                <button onclick="location.href='index.html'">
+                    <i class="fas fa-random"></i> Another Algorithm
+                </button>
+            </div>
+            <div class="input-group">
+                <label for="decrypt-result"><i class="fas fa-result"></i> Result:</label>
+                <textarea id="decrypt-result" placeholder="Decrypted result will appear here..." readonly></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Deactivate all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Activate selected tab
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+        
+        function encrypt() {
+            const plaintext = document.getElementById('plaintext').value;
+            const key = document.getElementById('encrypt-key').value;
+            
+            if (!plaintext || !key) {
+                alert('Please enter both message and key');
+                return;
+            }
+            
+            try {
+                const ciphertext = columnarTranspositionEncrypt(plaintext, key);
+                document.getElementById('encrypt-result').value = ciphertext;
+            } catch (e) {
+                alert('Error during encryption: ' + e.message);
+            }
+        }
+        
+        function decrypt() {
+            const ciphertext = document.getElementById('ciphertext').value;
+            const key = document.getElementById('decrypt-key').value;
+            
+            if (!ciphertext || !key) {
+                alert('Please enter both cipher and key');
+                return;
+            }
+            
+            try {
+                const plaintext = columnarTranspositionDecrypt(ciphertext, key);
+                document.getElementById('decrypt-result').value = plaintext;
+            } catch (e) {
+                alert('Error during decryption: ' + e.message);
+            }
+        }
+        
+        function columnarTranspositionEncrypt(plaintext, key) {
+            // Process the key
+            const keyParts = key.split(' ').map(Number);
+            const keyOrder = getKeyOrder(keyParts);
+            const numColumns = keyParts.length;
+            
+            // Remove spaces and convert to uppercase
+            const processedText = plaintext.replace(/\s+/g, '').toUpperCase();
+            const textLength = processedText.length;
+            
+            // Calculate number of rows needed
+            const numRows = Math.ceil(textLength / numColumns);
+            
+            // Create the grid
+            const grid = [];
+            for (let i = 0; i < numRows; i++) {
+                grid[i] = [];
+                for (let j = 0; j < numColumns; j++) {
+                    const index = i * numColumns + j;
+                    grid[i][j] = index < textLength ? processedText[index] : 'X'; // Padding with 'X'
+                }
+            }
+            
+            // Read columns according to key order
+            let ciphertext = '';
+            for (const col of keyOrder) {
+                for (let row = 0; row < numRows; row++) {
+                    ciphertext += grid[row][col];
+                }
+            }
+            
+            return ciphertext;
+        }
+        
+        function columnarTranspositionDecrypt(ciphertext, key) {
+            // Process the key
+            const keyParts = key.split(' ').map(Number);
+            const keyOrder = getKeyOrder(keyParts);
+            const numColumns = keyParts.length;
+            
+            const textLength = ciphertext.length;
+            const numRows = Math.ceil(textLength / numColumns);
+            
+            // Create empty grid
+            const grid = [];
+            for (let i = 0; i < numRows; i++) {
+                grid[i] = new Array(numColumns);
+            }
+            
+            // Fill the grid column by column in key order
+            let index = 0;
+            for (const col of keyOrder) {
+                for (let row = 0; row < numRows; row++) {
+                    if (index < textLength) {
+                        grid[row][col] = ciphertext[index++];
+                    }
+                }
+            }
+            
+            // Read row by row
+            let plaintext = '';
+            for (let row = 0; row < numRows; row++) {
+                for (let col = 0; col < numColumns; col++) {
+                    plaintext += grid[row][col];
+                }
+            }
+            
+            // Remove any padding 'X's at the end
+            plaintext = plaintext.replace(/X+$/, '');
+            
+            return plaintext;
+        }
+        
+        function getKeyOrder(keyParts) {
+            // Create an array of objects with original position and value
+            const indexedKey = keyParts.map((value, index) => ({value, index}));
+            
+            // Sort by value
+            indexedKey.sort((a, b) => a.value - b.value);
+            
+            // Extract the original indices in the order of sorted values
+            return indexedKey.map(item => item.index);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playfair Cipher</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-lock"></i> Computer Security Project</h1>
+        
+        <div class="input-group">
+            <label for="keyword"><i class="fas fa-key"></i> Keyword:</label>
+            <input type="text" id="keyword" placeholder="Enter your keyword...">
+        </div>
+        
+        <div class="input-group">
+            <label for="inputText"><i class="fas fa-pencil-alt"></i> Text:</label>
+            <textarea id="inputText" placeholder="Enter your text here..."></textarea>
+        </div>
+        
+        <div class="buttons">
+            <button onclick="encrypt()"><i class="fas fa-lock"></i> Encrypt</button>
+            <button onclick="decrypt()"><i class="fas fa-unlock"></i> Decrypt</button>
+        </div>
+
+        
+        <div class="buttons">
+            <button onclick="location.href='transportation.html'">
+                <i class="fas fa-random"></i> Another Algorithm
+            </button>
+        </div>
+
+        <div class="input-group">
+            <label for="outputText"><i class="fas fa-file-alt"></i> Result:</label>
+            <textarea id="outputText" placeholder="Result will appear here..." readonly></textarea>
+        </div>
+    </div>
+
+    <script src="playfair.js"></script>
+</body>
+</html>
